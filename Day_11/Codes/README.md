@@ -5,8 +5,6 @@ This folder contains the Verilog HDL implementation for a fundamental hardware i
 
 ## Project Files
 
-*(Note: File names have been standardized to match the project structure)*
-
 *   **`switch_to_led.v`**
     The core hardware description module. It implements an 8-bit interface where eight slide switches (`switch[7:0]`) are wired directly to eight LEDs (`led[7:0]`) using a continuous `assign` statement. Because this is purely combinational logic, toggling any switch instantly updates the state of its corresponding LED.
 
