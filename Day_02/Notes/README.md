@@ -1,62 +1,93 @@
-# Day 02: Full Adder Implementation via Two Half Adders
+# Day 02 - Full Adder using Two Half Adders
 
-## Overview
-A **Half Adder** is a foundational combinational logic circuit that computes the addition of two binary inputs (**$A$** and **$B$**), generating a **Sum** and a **Carry**. However, its inability to process a carry input from a previous stage limits its use in multi-bit addition operations.
+## Introduction
 
-A **Full Adder** overcomes this limitation by accepting three inputs (**$A$**, **$B$**, and **$C_{in}$**) to produce a final **Sum** and **$C_{out}$** (Carry Out). 
+A **Half Adder** is a combinational logic circuit that adds two binary inputs (**A** and **B**) and produces **Sum** and **Carry** as outputs. However, it cannot add a carry input from a previous stage.
 
-This project demonstrates how a Full Adder can be constructed hierarchically using **two Half Adders and a single OR gate**, promoting modular, readable, and reusable hardware design.
+A **Full Adder** is a combinational logic circuit that adds three binary inputs (**A**, **B**, and **Carry In (Cin)**) and produces **Sum** and **Carry Out (Cout)** as outputs.
+
+A Full Adder can be implemented using **two Half Adders and one OR gate**, making the design simple, modular, and easy to understand.
 
 ---
 
-## Half Adder Fundamentals
+# Half Adder
 
-The Half Adder computes the basic addition of two bits.
+The Half Adder adds two binary inputs and generates a **Sum** and a **Carry**.
 
-### Boolean Equations
-$$Sum = A \oplus B$$
-$$Carry = A \cdot B$$
+## Boolean Equations
 
-### Truth Table
+```text
+Sum   = A ^ B
+Carry = A & B
+```
 
-| $A$ | $B$ | Sum | Carry |
-|---|---|---|---|
+## Truth Table
+
+| A | B | Sum | Carry |
+|---|---|-----|-------|
 | 0 | 0 | 0 | 0 |
 | 0 | 1 | 1 | 0 |
 | 1 | 0 | 1 | 0 |
 | 1 | 1 | 0 | 1 |
 
-> **Example:** Adding $1 + 1$ results in a $Sum = 0$ and a $Carry = 1$.
+### Example
+```text
+Adding 1 + 1 gives:
+
+- Sum = 0
+- Carry = 1
+```
+---
+
+# Full Adder
+
+The Full Adder adds three binary inputs (**A**, **B**, and **Cin**) and produces **Sum** and **Carry Out**.
+
+Unlike a Half Adder, it can add the carry generated from the previous stage, making it suitable for multi-bit binary addition.
+
+## Working
+
+### Step 1
+
+The first Half Adder adds **A** and **B**.
+
+```text
+Sum1   = A ^ B
+Carry1 = A & B
+```
+
+### Step 2
+
+The second Half Adder adds **Sum1** and **Cin**.
+
+```text
+Sum    = Sum1 ^ Cin
+Carry2 = Sum1 & Cin
+```
+
+### Step 3
+
+The Carry outputs from both Half Adders are combined using an OR gate.
+
+```text
+Carry = Carry1 | Carry2
+```
 
 ---
 
-## Full Adder Architecture
+## Boolean Equations
 
-A Full Adder computes the sum of three bits and is essential for cascading adders in multi-bit systems.
-
-### Step-by-Step Operation
-
-1. **First Stage (Half Adder 1):** Adds inputs $A$ and $B$.
-   $$Sum_1 = A \oplus B$$
-   $$Carry_1 = A \cdot B$$
-
-2. **Second Stage (Half Adder 2):** Adds the intermediate sum ($Sum_1$) to the carry input ($C_{in}$).
-   $$Sum_{final} = Sum_1 \oplus C_{in}$$
-   $$Carry_2 = Sum_1 \cdot C_{in}$$
-
-3. **Carry Logic (OR Gate):** The carry outputs from both Half Adders are combined. If either stage generates a carry, the final carry out is high.
-   $$C_{out} = Carry_1 + Carry_2$$
-
-### Final Boolean Equations
-$$Sum = A \oplus B \oplus C_{in}$$
-$$C_{out} = (A \cdot B) + (C_{in} \cdot (A \oplus B))$$
+```text
+Sum   = A ^ B ^ Cin
+Carry = (A & B) | (Cin & (A ^ B))
+```
 
 ---
 
-## Full Adder Truth Table
+## Truth Table
 
-| $A$ | $B$ | $C_{in}$ | Sum | $C_{out}$ |
-|---|---|---|---|---|
+| A | B | Cin | Sum | Carry |
+|---|---|-----|-----|-------|
 | 0 | 0 | 0 | 0 | 0 |
 | 0 | 0 | 1 | 1 | 0 |
 | 0 | 1 | 0 | 1 | 0 |
@@ -68,25 +99,43 @@ $$C_{out} = (A \cdot B) + (C_{in} \cdot (A \oplus B))$$
 
 ---
 
-## Verilog Operators Used
+## Circuit Implementation
 
-When translating this logic into Verilog HDL, the following bitwise operators are utilized:
+A Full Adder is implemented using:
+```text
+- Two Half Adders
+- One OR Gate
+```
+The first Half Adder generates an intermediate Sum (**Sum1**) and **Carry1**.
 
-| Logic Gate | Mathematical Symbol | Verilog Operator |
-|---|---|---|
-| **AND** | $\cdot$ | `&` |
-| **OR** | $+$ | `\|` |
-| **XOR** | $\oplus$ | `^` |
+The second Half Adder adds **Sum1** with **Cin** to generate the final **Sum** and **Carry2**.
+
+Finally, the OR gate combines **Carry1** and **Carry2** to produce the final **Carry Out**.
+
+---
+
+## Verilog Operators
+
+```text
+AND : &
+OR  : |
+XOR : ^
+```
 
 ---
 
 ## Applications
-*   **Arithmetic Logic Units (ALUs):** The core computational block in microprocessors.
-*   **Ripple Carry Adders:** Chaining multiple Full Adders to add 8-bit, 16-bit, or 32-bit numbers.
-*   **Digital Signal Processing (DSP):** Used heavily in filtering and hardware mathematics.
-*   **ASIC & FPGA Design:** Fundamental building blocks for custom digital systems.
-
+```text
+- Arithmetic Logic Unit (ALU)
+- Binary Adders
+- Ripple Carry Adders
+- Digital Computers
+- FPGA Design
+- ASIC Design
+- Embedded Systems
+```
 ---
 
-## Summary
-This project successfully models a Full Adder using Verilog HDL by hierarchically instantiating two Half Adders. The simulation results confirm that the generated Sum and Carry Out strictly adhere to the expected truth table. This modular approach not only simplifies the code but also closely mirrors how complex digital circuits are physically synthesized from basic logic primitives.
+## Conclusion
+
+The **Full Adder using Two Half Adders** was successfully designed and simulated using Verilog HDL. The simulation results verified that the generated **Sum** and **Carry Out** matched the expected truth table. This design demonstrates hierarchical design by reusing Half Adder modules to build a more complex digital circuit.

@@ -1,20 +1,17 @@
-# Day 16 - Mealy Sequence Detector
+# Day 16 - Sequence Detector (Mealy Machine)
 
-This directory contains the Verilog HDL implementation of a **Mealy Sequence Detector** designed to detect the binary sequence **111** using D Flip-Flops.
+This folder contains the Verilog HDL programs for implementing a **Sequence Detector (Mealy Machine)** using **D Flip-Flops**.
 
 ## Files
 
-- `Sequence_Detector.v`
-- `seq_det_tb.v`
-- `Sequence_Detector.xdc`
+- Sequence_Detector.v
+- seq_det_tb.v
+- Sequence_Detector.xdc
 
 ## Description
 
-### `Sequence_Detector.v`
-This file includes the complete hardware design for the Mealy sequence detector along with the D Flip-Flop module. The D Flip-Flops are used to store the present state, while the combinational logic determines the next state and generates the output. The detector asserts the output HIGH whenever the input sequence **111** is identified.
+``Sequence_Detector.v`` contains both the **D Flip-Flop** module and the **Mealy Sequence Detector** module. The D Flip-Flop acts as the memory element for storing the current state, while the sequence detector uses two D Flip-Flops and combinational logic to detect the binary sequence **111**. The output becomes HIGH whenever the required sequence is detected.
 
-### `seq_det_tb.v`
-This testbench is used to simulate and validate the functionality of the sequence detector. It applies reset conditions and different serial input sequences to verify that the detector correctly recognizes the target sequence and produces the expected output.
+``seq_det_tb.v`` contains the testbench used to simulate and verify the operation of the sequence detector. The simulation applies reset and multiple serial input patterns to verify that the detector correctly identifies the sequence **111**.
 
-### `Sequence_Detector.xdc`
-This Xilinx Design Constraints (XDC) file assigns the FPGA board pins for the **24 MHz clock**, **reset button**, **serial input switch**, and **output LED**. It also configures the required **LVCMOS33** I/O standard for successful synthesis and implementation on the FPGA.
+``Sequence_Detector.xdc`` contains the Xilinx Design Constraints (XDC) file that maps the **24 MHz system clock**, **reset button**, **serial input switch**, and **output LED** to the FPGA pins. It also specifies the **LVCMOS33** I/O standard required for FPGA implementation.

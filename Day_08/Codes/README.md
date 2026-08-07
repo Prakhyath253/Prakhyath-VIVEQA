@@ -1,24 +1,14 @@
-# Day 08: Edge Detector Design
+# Day 08 - Verilog Codes
 
-## Overview
-This folder contains the Verilog HDL implementation of a digital Edge Detector. The circuit is designed to monitor an incoming signal and generate a one-cycle pulse whenever a transition (edge) occurs. It utilizes a D Flip-Flop to store the previous state of the signal, allowing for real-time comparison against the current state.
+This folder contains the Verilog HDL programs for implementing an Edge Detector using a D Flip-Flop.
 
-## Project Files
+## Files
 
-*   **`edge_detector.v`**: The core hardware design module.
-*   **`tb_edge_detector.v`**: The testbench used for simulation.
+- edge_detector.v
+- tb_edge_detector.v
 
-## Module Descriptions
+## Description
 
-### `edge_detector.v` (Core Design)
-This module is responsible for detecting transitions on the input signal. It works by delaying the input signal by one clock cycle using a D Flip-Flop. Combinational logic then compares the live input against this delayed (previous) state to trigger the appropriate output flags:
-*   **Positive Edge:** Triggers when the signal transitions from 0 to 1.
-*   **Negative Edge:** Triggers when the signal transitions from 1 to 0.
-*   **Any Edge (Both):** Triggers on any state change (either rising or falling).
+**edge_detector.v** contains the Verilog module for detecting positive, negative, and both edges of an input signal. The previous state of the input signal is stored using a D Flip-Flop, and combinational logic compares the current and previous states to generate the required edge detection signals.
 
-### `tb_edge_detector.v` (Testbench)
-This file provides the simulation environment to validate the edge detection logic. The testbench verifies the module's accuracy by:
-*   Generating a continuous system clock.
-*   Applying an initial reset sequence.
-*   Injecting various input signal transitions (both fast and slow).
-*   Monitoring the outputs to ensure the positive, negative, and both-edge flags assert correctly for exactly one clock cycle.
+**tb_edge_detector.v** contains the testbench used to simulate and verify the functionality of the Edge Detector by generating the clock, applying reset, changing the input signal, and observing the positive edge, negative edge, and both-edge detection outputs.

@@ -1,89 +1,183 @@
-# Day 06: Sequential Repeat Adder (149 Iterations)
+# Day 06 - Repeat Adder (149 Iterations)
 
-## Overview
-This project implements a sequential digital circuit that performs repeated addition of a single input value over multiple clock cycles. Rather than relying on a combinational hardware multiplier, this design utilizes a feedback accumulator to repeatedly add the input to itself.
+## Introduction
 
-In this architecture, an 8-bit input data stream is loaded into the output register during a reset state. The circuit then executes **149 consecutive additions** of this input value. An internal 8-bit counter tracks the iterations, and a `done` flag is asserted once the operation concludes.
+A Repeat Adder is a sequential digital circuit used to repeatedly add the same input value over multiple clock cycles. Instead of using a hardware multiplier, the circuit performs repeated addition using a feedback accumulator.
 
-## Hardware Components
-*   8-bit Feedback Adder
-*   8-bit Accumulator Register
-*   8-bit Counter
-*   Synchronous Clock (`clk`)
-*   Asynchronous Reset (`rst`)
-*   Completion Flag (`done`)
+In this design, an 8-bit input is loaded into the output register during reset. The input is then added to the accumulated value **149 times**. An internal counter keeps track of the number of additions, and a **done** signal indicates when the operation is complete.
 
-## Port Description
+---
 
-### Inputs
-*   **`clk`**: System clock signal
-*   **`rst`**: Asynchronous reset (Active high)
-*   **`in_data [7:0]`**: 8-bit input data bus
+## Circuit Components
 
-### Outputs
-*   **`out_data [7:0]`**: 8-bit accumulated output
-*   **`done`**: High when 149 iterations are complete
+The circuit consists of:
 
-## Operational Flow
+- Feedback Adder
+- 8-bit Accumulator Register
+- 8-bit Counter
+- Clock
+- Reset
+- Done Signal
 
-### 1. Initialization (Reset State)
-When `rst = 1`:
-*   Accumulator (`out_data`) loads `in_data`.
-*   Counter resets to `0`.
-*   `done` flag is cleared to `0`.
+---
 
-### 2. Active Addition
-When `rst = 0`, on every rising edge of the clock:
-*   The accumulator updates: `out_data <= out_data + in_data`
-*   The counter increments: `count <= count + 1`
+## Inputs
 
-### 3. Completion
-Once `count` reaches **149**:
-*   The addition operation halts.
-*   The `done` signal asserts to `1`.
+- **clk** – System clock
+- **rst** – Asynchronous reset
+- **in_data [7:0]** – 8-bit input data
 
-## Example Execution
-Assuming an initial `in_data` of **8**:
+## Outputs
 
-| Clock Cycle | Counter | `out_data` |
-|---|---|---|
+- **out_data [7:0]** – Accumulated output
+- **done** – Indicates completion of the operation
+
+---
+
+## Working
+
+### Reset (rst = 1)
+
+- The accumulator is initialized with **in_data**.
+- The counter is reset to **0**.
+- The **done** signal is cleared.
+
+### Addition (rst = 0)
+
+On every positive edge of the clock,
+
+- The current value of **out_data** is added with **in_data**.
+- The result is stored back into **out_data**.
+- The counter increments by **1**.
+
+The process continues until the counter reaches **149**.
+
+### Completion
+
+When
+
+```
+count = 149
+```
+
+- The additions stop.
+- The **done** signal becomes **1**.
+
+---
+
+## Operation Flow
+
+### Step 1
+
+Initialize the circuit during reset.
+
+```
+out_data = in_data
+count = 0
+done = 0
+```
+
+### Step 2
+
+Perform repeated addition.
+
+```
+out_data = out_data + in_data
+```
+
+### Step 3
+
+Increment the counter.
+
+```
+count = count + 1
+```
+
+### Step 4
+
+When **149 additions** are completed,
+
+```
+done = 1
+```
+
+---
+
+## Example Operation
+
+Assume
+
+```
+in_data = 8
+```
+
+| Clock Cycle | Count | out_data |
+|-------------|------:|---------:|
 | Reset | 0 | 8 |
 | 1 | 1 | 16 |
 | 2 | 2 | 24 |
 | 3 | 3 | 32 |
 | ... | ... | ... |
 | 30 | 30 | 248 |
-| 31 | 31 | 0 *(8-bit Overflow)* |
+| 31 | 31 | 0 *(Overflow)* |
 | 32 | 32 | 8 |
+| ... | ... | ... |
 
-> **Note on Overflow:** Because `out_data` is an 8-bit register, its maximum value is 255. Any accumulation exceeding 255 will naturally wrap around to 0.
+Since **out_data** is an **8-bit register**, it stores values only from **0 to 255**.
 
-## Internal Registers
+Whenever the accumulated value exceeds **255**, it overflows and wraps around to **0**.
+
+---
+
+## Register Description
 
 | Register | Function |
-|---|---|
-| **`out_data`** | Accumulates and stores the running sum |
-| **`count`** | Tracks the number of completed clock cycles |
-| **`done`** | Flags the completion of the 149th addition |
+|----------|----------|
+| **out_data** | Stores the accumulated result |
+| **count** | Counts the number of additions |
+| **done** | Indicates completion of the operation |
 
-## Verilog Implementation Details
+---
 
-| Operator | Symbol | Purpose |
-|---|---|---|
-| **Addition** | `+` | Computes the sum of the accumulator and input |
-| **Less Than** | `<` | Evaluates if the counter has reached 149 |
-| **Non-blocking** | `<=` | Synchronously updates register states |
+## Verilog Operators Used
 
-## Pros and Cons
+| Operator | Symbol | Description |
+|----------|--------|-------------|
+| Addition | `+` | Adds the input value to the accumulated result |
+| Less Than | `<` | Checks whether 149 additions are completed |
+| Non-blocking Assignment | `<=` | Updates sequential registers |
 
-### Advantages
-*   **Hardware Efficiency:** Requires only one adder instead of a resource-heavy multiplier block.
-*   **Simplicity:** Straightforward sequential logic and state management.
-*   **FPGA Friendly:** Maps cleanly to standard FPGA logic elements.
+---
 
-### Limitations
-*   **Latency:** Takes 149 clock cycles to yield a final valid result, making it slower than combinational multipliers.
-*   **Width Constraints:** The 8-bit accumulator will overflow frequently for larger inputs unless the output width is expanded.
+## Applications
 
-## Summary
-This Verilog HDL design demonstrates a sequential arithmetic approach by using a feedback adder, an 8-bit accumulator, and a counter. It successfully adds an input value repeatedly for 149 clock cycles. This project serves as a foundational example of trading execution speed for hardware area efficiency in digital logic design.
+- Sequential arithmetic circuits
+- Repeated-addition multiplication
+- FPGA Design
+- ASIC Design
+- Digital Signal Processing
+- Educational Verilog projects
+
+---
+
+## Advantages
+
+- Simple sequential design
+- Uses only one adder through feedback
+- Requires minimal hardware
+- Easy to understand and implement
+- Suitable for FPGA implementation
+
+---
+
+## Limitations
+
+- Requires multiple clock cycles to complete the operation.
+- Slower than a dedicated hardware multiplier.
+- Limited by the width of the accumulator, causing overflow for larger results.
+
+---
+
+## Conclusion
+
+A Repeat Adder was designed using an 8-bit accumulator, an 8-bit counter and a feedback adder in Verilog HDL. The circuit repeatedly adds the input value for **149 clock cycles** while updating the accumulated result. Once all additions are completed, the **done** signal is asserted. This design demonstrates the concept of sequential arithmetic using repeated addition and provides a simple hardware-efficient implementation suitable for FPGA-based digital systems.

@@ -1,43 +1,66 @@
-# Day 03: 4-Bit Adder/Subtractor using Full Adders
+# Day 03 - 4-Bit Adder/Subtractor using Full Adders
 
-## Overview
-A **4-Bit Adder/Subtractor** is a combinational logic circuit capable of performing both addition and subtraction on two 4-bit binary numbers.
+## Introduction
 
-The architecture relies on a cascade of **four Full Adders**. A mode control signal, **$m$**, dictates the operation:
-*   **$m = 0$** $\rightarrow$ Addition ($A + B$)
-*   **$m = 1$** $\rightarrow$ Subtraction ($A - B$) via the **2's complement** method.
+A **4-Bit Adder/Subtractor** is a combinational logic circuit used to perform both **addition** and **subtraction** of two 4-bit binary numbers.
 
+The circuit is built by connecting **four Full Adders** in series. A control signal **m** selects the required operation.
+```text
+- **m = 0** → Addition (`A + B`)
+- **m = 1** → Subtraction (`A - B`) using the **2's complement** method
+```
 ---
 
-## Building Blocks
+# Half Adder
 
-### 1. Half Adder
-A Half Adder computes the sum of two 1-bit binary inputs, generating a **Sum** and a **Carry**.
+A **Half Adder** adds two 1-bit binary numbers and produces a **Sum** and a **Carry**.
 
-**Boolean Equations:**
-$$Sum = A \oplus B$$
-$$Carry = A \cdot B$$
+## Boolean Equations
 
-**Truth Table:**
+```text
+Sum   = A ^ B
+Carry = A & B
+```
+
+## Truth Table
 
 | A | B | Sum | Carry |
-|---|---|---|---|
+|:-:|:-:|:---:|:-----:|
 | 0 | 0 | 0 | 0 |
 | 0 | 1 | 1 | 0 |
 | 1 | 0 | 1 | 0 |
 | 1 | 1 | 0 | 1 |
 
-### 2. Full Adder
-A Full Adder expands on the Half Adder by accommodating a third input: the Carry In ($C_{in}$). It is constructed hierarchically using two Half Adders and one OR gate.
+---
 
-**Boolean Equations:**
-$$Sum = A \oplus B \oplus C_{in}$$
-$$C_{out} = (A \cdot B) + (C_{in} \cdot (A \oplus B))$$
+# Full Adder
 
-**Truth Table:**
+A **Full Adder** adds three binary inputs.
 
-| A | B | $C_{in}$ | Sum | $C_{out}$ |
-|---|---|---|---|---|
+### Inputs
+```text
+- A
+- B
+- Carry In (Cin)
+```
+### Outputs
+```text
+- Sum
+- Carry Out (Carry)
+```
+A Full Adder is implemented using **two Half Adders** and **one OR gate**.
+
+## Boolean Equations
+
+```text
+Sum   = A ^ B ^ Cin
+Carry = (A & B) | (Cin & (A ^ B))
+```
+
+## Truth Table
+
+| A | B | Cin | Sum | Carry |
+|:-:|:-:|:---:|:---:|:-----:|
 | 0 | 0 | 0 | 0 | 0 |
 | 0 | 0 | 1 | 1 | 0 |
 | 0 | 1 | 0 | 1 | 0 |
@@ -49,42 +72,95 @@ $$C_{out} = (A \cdot B) + (C_{in} \cdot (A \oplus B))$$
 
 ---
 
-## 4-Bit Adder/Subtractor Architecture
+# 4-Bit Adder/Subtractor
 
-The complete circuit chains four Full Adders together. The mode bit **$m$** controls the input sent to the $B$ terminals and sets the initial carry state.
+The circuit consists of **four Full Adders** connected in cascade.
 
-### Operation Modes
+The control signal **m** determines whether the circuit performs **addition** or **subtraction**.
 
-| Mode ($m$) | Operation | Input routed to B | Initial $C_{in}$ | Final Output |
-|:---:|---|---|:---:|---|
-| **0** | Addition | $B$ (Unchanged) | 0 | $A + B$ |
-| **1** | Subtraction | $\overline{B}$ (Complemented) | 1 | $A - B$ |
+## Operation Truth Table
 
-### Operational Flow
-
-**Step 1: Input Conditioning (XOR Gate)**
-Each bit of input $B$ is passed through an XOR gate alongside $m$:
-$$B' = B \oplus m$$
-*   If $m = 0$, $B' = B$
-*   If $m = 1$, $B' = \overline{B}$
-
-**Step 2: Carry Initialization**
-The very first Full Adder receives $m$ directly as its $C_{in}$.
-*   For addition ($m=0$), $C_{in} = 0$.
-*   For subtraction ($m=1$), $C_{in} = 1$ (which completes the 2's complement logic: invert and add 1).
-
-**Step 3: Ripple Propagation**
-Each Full Adder computes its bitwise Sum and passes its $C_{out}$ to the $C_{in}$ of the next stage in the cascade.
-
-**Step 4: Final Output**
-The circuit yields a 4-bit Sum and a final Carry Out flag.
+| m | Operation | B Input | Initial Carry (Cin) | Output |
+|:-:|-----------|---------|:-------------------:|--------|
+| 0 | Addition | B | 0 | A + B |
+| 1 | Subtraction | B is complemented (`~B`) | 1 | A - B |
 
 ---
 
-## Example Traces
+# Working
 
-| A | B | $m$ (Mode) | Operation | Result | $C_{out}$ |
-|---|---|:---:|---|---|:---:|
+### Addition (m = 0)
+```text
+- Input **B** is used directly.
+- Initial Carry In = **0**.
+- The circuit performs:
+```
+```text
+A + B
+```
+
+### Subtraction (m = 1)
+```text
+- Every bit of **B** is inverted using XOR gates.
+- Initial Carry In = **1**.
+- The circuit performs:
+```
+```text
+A + (~B + 1)
+```
+
+which is equivalent to
+
+```text
+A - B
+```
+
+using the **2's complement** method.
+
+---
+
+# Block Operation
+
+### Step 1
+
+Each bit of **B** is XORed with **m**.
+
+```text
+B' = B ^ m
+```
+
+If
+
+```text
+m = 0 → B' = B
+m = 1 → B' = ~B
+```
+
+### Step 2
+
+The first Full Adder receives
+
+```text
+Cin = m
+```
+
+### Step 3
+
+Each Full Adder passes its Carry Out to the next Full Adder.
+
+### Step 4
+
+The final stage produces
+```text
+- 4-bit Sum
+- Final Carry
+```
+---
+
+# Example Truth Table
+
+| A | B | m | Operation | Result | Carry |
+|:----:|:----:|:-:|-----------|:------:|:-----:|
 | 0101 | 0011 | 0 | 5 + 3 | 1000 | 0 |
 | 1001 | 0110 | 0 | 9 + 6 | 1111 | 0 |
 | 1111 | 0001 | 0 | 15 + 1 | 0000 | 1 |
@@ -95,30 +171,40 @@ The circuit yields a 4-bit Sum and a final Carry Out flag.
 
 ---
 
-## Verilog Implementation Details
+# Verilog Operators Used
 
-| Operator | Symbol | Hardware Context |
-|---|:---:|---|
-| **AND** | `&` | Carry generation |
-| **OR** | `\|` | Carry combination |
-| **XOR** | `^` | Sum generation & $B$ input toggling |
-| **NOT** | `~` | 1's complement representation |
-
----
-
-## Applications
-*   Arithmetic Logic Units (ALUs)
-*   Ripple Carry Adders
-*   Microprocessor datapaths
-*   FPGA and ASIC design
-*   Embedded control systems
-
-## Advantages
-*   **Resource Efficiency:** Uses the exact same hardware blocks for both addition and subtraction.
-*   **Scalability:** The cascading architecture easily scales up to 8-bit, 16-bit, or 32-bit widths.
-*   **Modularity:** Employs hierarchical design by instantiating smaller sub-modules (Half Adders $\rightarrow$ Full Adders).
+| Operator | Symbol | Description |
+|-----------|--------|-------------|
+| AND | `&` | Generates Carry |
+| OR | `|` | Combines Carry outputs |
+| XOR | `^` | Generates Sum and complements B |
+| NOT | `~` | Produces 1's complement |
 
 ---
 
-## Summary
-This project models a 4-Bit Adder/Subtractor in Verilog HDL using a hierarchical design methodology. By combining Half Adders into Full Adders and cascading them, the circuit performs addition or 2's complement subtraction based on a single control bit. This modular architecture highlights a fundamental technique in digital logic design, making it highly efficient for FPGA synthesis.
+# Applications
+```text
+- Arithmetic Logic Unit (ALU)
+- Binary Addition
+- Binary Subtraction
+- Ripple Carry Adder
+- FPGA Design
+- ASIC Design
+- Embedded Systems
+- Digital Electronics
+```
+---
+
+# Advantages
+```text
+- Simple and modular design
+- Uses the same hardware for addition and subtraction
+- Easy to implement using Verilog HDL
+- Suitable for FPGA implementation
+- Easy to expand to 8-bit, 16-bit, or higher-bit adders
+```
+---
+
+# Conclusion
+
+A **4-Bit Adder/Subtractor** was designed using a hierarchical approach in Verilog HDL. A **Full Adder** was first constructed using two **Half Adders** and four Full Adders were connected to form the complete circuit. By using the control signal **m**, the same hardware performs both addition and subtraction through the **2's complement** method. Simulation results verified the correct operation of the design, making it suitable for FPGA-based digital systems.

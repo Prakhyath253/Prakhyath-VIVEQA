@@ -1,97 +1,184 @@
-# Day 10: 8-Bit Arithmetic Logic Unit (ALU)
+# Day 10 - Arithmetic Logic Unit (ALU)
 
-## Overview
-An **Arithmetic Logic Unit (ALU)** is a core combinational digital circuit responsible for performing mathematical and bitwise operations. It serves as the computational backbone of processors and microcontrollers.
+## Introduction
 
-In this project, an 8-bit ALU is implemented. The design extracts two 4-bit operands (**A** and **B**) from hardware slide switches. A 16-button keypad acts as the operation selector, mapping each key to a distinct arithmetic or logical function. The final computed result is continuously driven to an 8-bit LED array.
+An **Arithmetic Logic Unit (ALU)** is a combinational digital circuit that performs arithmetic and logical operations on binary data. It is one of the fundamental components of a processor and is widely used in digital systems.
 
----
-
-## Hardware Configuration
-
-### Port Mapping
-*   **`push[7:4]`**: Operand A (4-bit input)
-*   **`push[3:0]`**: Operand B (4-bit input)
-*   **`key[15:0]`**: 16-bit One-Hot Operation Selector (Keypad)
-*   **`led[7:0]`**: 8-bit Computed Output
-
-### Operational Flow
-Because the module uses purely combinational logic, the circuit requires no clock. 
-1.  The hardware continuously reads the 8-bit switch bus and splits it into operands A and B.
-2.  The combinational logic evaluates the active keypad button.
-3.  The selected mathematical or logical transformation is applied to A and B.
-4.  The output immediately updates on the LED array.
+In this design, two 4-bit operands (**A** and **B**) are provided through the FPGA slide switches, while sixteen keypad inputs are used to select different arithmetic and logical operations. The result of the selected operation is displayed on the LEDs.
 
 ---
 
-## Instruction Set (ALU Operations)
+# Circuit Components
 
-| Key Input | Operation | Verilog Expression |
-| :--- | :--- | :--- |
-| `key[0]` | Addition | `A + B` |
-| `key[1]` | Subtraction | `A - B` |
-| `key[2]` | Bitwise AND | `A & B` |
-| `key[3]` | Bitwise OR | `A | B` |
-| `key[4]` | Left Shift | `A << B` |
-| `key[5]` | Right Shift | `A >> B` |
-| `key[6]` | Bitwise XOR | `A ^ B` |
-| `key[7]` | Bitwise NOT (A) | `~A` |
-| `key[8]` | Multiplication | `A * B` |
-| `key[9]` | Bitwise NOR | `~(A | B)` |
-| `key[10]` | Bitwise NAND | `~(A & B)` |
-| `key[11]` | Left Shift by 2 | `A << 2` |
-| `key[12]` | Right Shift by 2 | `A >> 2` |
-| `key[13]` | Bitwise XNOR | `~(A ^ B)` |
-| `key[14]` | Increment A | `A + 1` |
-| `key[15]` | Increment B | `B + 1` |
+The circuit consists of:
+
+- Two 4-bit Operands (A and B)
+- Combinational Logic
+- Operation Selection Keys
+- LED Output
 
 ---
 
-## Execution Example
-Assume the input switches are set such that **A = 8** (`4'b1000`) and **B = 8** (`4'b1000`).
-*(Note: Logical inversions like NOT, NOR, and NAND are calculated assuming the 4-bit operands are zero-extended to an 8-bit output bus).*
+# Inputs
 
-| Operation | Decimal Result | 8-Bit Binary (`led[7:0]`) |
-| :--- | :--- | :--- |
-| **Addition** | 16 | `0001_0000` |
-| **Subtraction** | 0 | `0000_0000` |
-| **AND** | 8 | `0000_1000` |
-| **OR** | 8 | `0000_1000` |
-| **XOR** | 0 | `0000_0000` |
-| **NOT A** | 247 | `1111_0111` |
-| **Multiplication** | 64 | `0100_0000` |
-| **NOR** | 247 | `1111_0111` |
-| **NAND** | 247 | `1111_0111` |
-| **A << 2** | 32 | `0010_0000` |
-| **A >> 2** | 2 | `0000_0010` |
-| **XNOR** | 255 | `1111_1111` |
-| **Increment A** | 9 | `0000_1001` |
+- **push[7:4]** – Operand A (4-bit)
+- **push[3:0]** – Operand B (4-bit)
+- **key[15:0]** – Operation Select
 
 ---
 
-## Verilog Implementation Details
+# Outputs
 
-| Construct | Usage in Design |
-| :--- | :--- |
-| `always @(*)` | Establishes the combinational logic block |
-| `if-else` | Routes the correct operation based on the active key |
-| `assign` | Continuously wires the switch bus to internal operand nets |
-| `wire` | Defines the internal routing for Operands A and B |
-| `reg` | Holds the ALU output value within the `always` block |
+- **led[7:0]** – ALU Result
 
 ---
 
-## Project Evaluation
+# Working
 
-### Advantages
-*   **Versatility:** Consolidates 16 distinct operations into a single hardware block.
-*   **Speed:** Purely combinational execution means the output is available with zero clock cycles of latency.
-*   **Foundation Building:** Demonstrates the core logic structures used inside commercial CPUs and microcontrollers.
+The ALU continuously monitors the keypad inputs.
 
-### Limitations
-*   **Fixed Width:** Hardcoded to accept only 4-bit inputs and generate an 8-bit output.
-*   **Single Issue:** Can only execute one instruction at a time based on keypad input.
-*   **Collision Handling:** The `if-else` cascade inherently assigns priority to lower keys if multiple buttons are pressed simultaneously.
+- Operand **A** is obtained from `push[7:4]`.
+- Operand **B** is obtained from `push[3:0]`.
+- When a keypad button is pressed, the corresponding arithmetic or logical operation is performed.
+- The result is displayed on the LEDs.
 
-## Summary
-This project successfully implements a 16-instruction Arithmetic Logic Unit using Verilog HDL. By routing slide switches as operands and keypad buttons as instruction selectors, the design provides an interactive, combinational demonstration of the fundamental arithmetic and logic operations that drive all modern digital computing.
+Since the design is purely combinational, the output updates immediately whenever the operands or selected operation change.
+
+---
+
+# ALU Operations
+
+| Key | Operation | Expression |
+|-----|-----------|------------|
+| key[0] | Addition | A + B |
+| key[1] | Subtraction | A − B |
+| key[2] | AND | A & B |
+| key[3] | OR | A \| B |
+| key[4] | Left Shift | A << B |
+| key[5] | Right Shift | A >> B |
+| key[6] | XOR | A ^ B |
+| key[7] | NOT | ~A |
+| key[8] | Multiplication | A × B |
+| key[9] | NOR | ~(A \| B) |
+| key[10] | NAND | ~(A & B) |
+| key[11] | Left Shift by 2 | A << 2 |
+| key[12] | Right Shift by 2 | A >> 2 |
+| key[13] | XNOR | ~(A ^ B) |
+| key[14] | Increment A | A + 1 |
+| key[15] | Increment B | B + 1 |
+
+---
+
+# Example Operation
+
+Assume
+
+```
+A = 8
+B = 8
+```
+
+| Selected Operation | Result |
+|--------------------|--------|
+| Addition | 16 |
+| Subtraction | 0 |
+| AND | 8 |
+| OR | 8 |
+| XOR | 0 |
+| NOT A | 247 (8-bit) |
+| Multiplication | 64 |
+| NOR | 247 |
+| NAND | 255 |
+| A << 2 | 32 |
+| A >> 2 | 2 |
+| XNOR | 255 |
+| A + 1 | 9 |
+| B + 1 | 9 |
+
+---
+
+# Operation Flow
+
+### Step 1
+
+Read operands from the slide switches.
+
+```
+A = push[7:4]
+B = push[3:0]
+```
+
+---
+
+### Step 2
+
+Read the keypad input.
+
+```
+key[15:0]
+```
+
+---
+
+### Step 3
+
+Select the required arithmetic or logical operation.
+
+---
+
+### Step 4
+
+Display the result on the LEDs.
+
+```
+led = Result
+```
+
+---
+
+# Verilog Constructs Used
+
+| Construct | Description |
+|-----------|-------------|
+| always @(*) | Creates combinational logic |
+| if-else | Selects the required ALU operation |
+| assign | Assigns operands A and B |
+| Wire | Stores operand values |
+| Reg | Stores ALU output |
+
+---
+
+# Applications
+
+- Microprocessors
+- Microcontrollers
+- Digital Signal Processing
+- FPGA-Based Systems
+- Arithmetic Circuits
+- Embedded Systems
+- Computer Architecture
+
+---
+
+# Advantages
+
+- Performs multiple operations using a single circuit.
+- Simple combinational design.
+- Fast operation with no clock required.
+- Easy to implement on an FPGA.
+- Supports both arithmetic and logical operations.
+
+---
+
+# Limitations
+
+- Operates on only 4-bit operands.
+- Produces 8-bit output only.
+- Only one operation can be selected at a time.
+- Shift operations depend on the value of operand B.
+
+---
+
+# Conclusion
+
+An 8-bit Arithmetic Logic Unit (ALU) was designed using Verilog HDL to perform sixteen arithmetic and logical operations on two 4-bit operands. The operation is selected using keypad inputs, and the result is displayed on LEDs. This design demonstrates the implementation of combinational logic and serves as a fundamental building block for processors and digital systems.

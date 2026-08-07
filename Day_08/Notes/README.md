@@ -1,45 +1,134 @@
-# Day 08: Edge Detector
+# Day 08 - Edge Detector
 
-## Overview
-An Edge Detector is a sequential digital circuit used to identify transitions in a signal. It captures when an input signal transitions from LOW to HIGH (positive edge), HIGH to LOW (negative edge), or any change in state (both edges). 
+## Introduction
 
-The design utilizes a D Flip-Flop to store the signal's previous state. This allows the circuit to compare the current input against the previous value in real-time using combinational logic.
+An Edge Detector is a sequential digital circuit used to detect transitions in a digital signal. It identifies when an input signal changes from LOW to HIGH (positive edge), HIGH to LOW (negative edge) or either transition (both edges).
 
----
-
-## Circuit Architecture
-
-### Components
-*   **D Flip-Flop**: Stores the previous state ($q$).
-*   **Combinational Logic**: Computes edge triggers.
-*   **Clock (`clk`)**: Synchronous timing reference.
-*   **Reset (`rst`)**: Asynchronous initialization.
-
-### Port Description
-| Port | Type | Description |
-| :--- | :--- | :--- |
-| `clk` | Input | System clock |
-| `rst` | Input | Asynchronous active-high reset |
-| `sig` | Input | Signal to be monitored |
-| `pos_edge` | Output | High on rising edge ($0 \to 1$) |
-| `neg_edge` | Output | High on falling edge ($1 \to 0$) |
-| `both_edge` | Output | High on any transition |
+In this design, a **D Flip-Flop** stores the previous value of the input signal. The current input is compared with the previous value using combinational logic to generate the required edge detection outputs.
 
 ---
 
-## Logic Equations
-The detection logic relies on comparing the current input (`sig`) with the stored previous state ($q$):
+# Circuit Components
 
-*   **Positive Edge**: $pos\_edge = sig \cdot \overline{q}$
-*   **Negative Edge**: $neg\_edge = \overline{sig} \cdot q$
-*   **Both Edges**: $both\_edge = pos\_edge + neg\_edge$
+The circuit consists of:
+
+- D Flip-Flop
+- Combinational Logic
+- Clock
+- Reset
 
 ---
 
-## Truth Table
+# Inputs
 
-| Previous ($q$) | Current (`sig`) | `pos_edge` | `neg_edge` | `both_edge` |
-| :--- | :--- | :--- | :--- | :--- |
+- **clk** – System clock
+- **rst** – Asynchronous reset
+- **sig** – Input signal to be monitored
+
+---
+
+# Outputs
+
+- **pos_edge** – Detects a rising edge (0 → 1)
+- **neg_edge** – Detects a falling edge (1 → 0)
+- **both_edge** – Detects either a rising or falling edge
+
+---
+
+# Working
+
+## Reset (rst = 1)
+
+The D Flip-Flop is cleared.
+
+```
+q = 0
+```
+
+No edge is detected.
+
+```
+pos_edge = 0
+neg_edge = 0
+both_edge = 0
+```
+
+---
+
+## Positive Edge Detection
+
+The previous value of the signal is stored in the D Flip-Flop.
+
+A positive edge occurs when
+
+```
+Previous Signal = 0
+Current Signal = 1
+```
+
+Equation
+
+```
+pos_edge = sig & ~q
+```
+
+---
+
+## Negative Edge Detection
+
+A negative edge occurs when
+
+```
+Previous Signal = 1
+Current Signal = 0
+```
+
+Equation
+
+```
+neg_edge = ~sig & q
+```
+
+---
+
+## Both Edge Detection
+
+Both-edge detection combines the positive and negative edge outputs.
+
+Equation
+
+```
+both_edge = pos_edge | neg_edge
+```
+
+---
+
+# Logic Equations
+
+Positive Edge
+
+```
+pos_edge = sig · q'
+```
+
+Negative Edge
+
+```
+neg_edge = sig' · q
+```
+
+Both Edge
+
+```
+both_edge = pos_edge + neg_edge
+```
+
+---
+
+# Truth Table
+
+| Previous Signal (q) | Current Signal (sig) | Positive Edge | Negative Edge | Both Edge |
+|---------------------|----------------------|---------------|---------------|-----------|
 | 0 | 0 | 0 | 0 | 0 |
 | 0 | 1 | 1 | 0 | 1 |
 | 1 | 0 | 0 | 1 | 1 |
@@ -47,16 +136,72 @@ The detection logic relies on comparing the current input (`sig`) with the store
 
 ---
 
-## Operational Flow
+# Operation Flow
 
-1.  **Initialization**: On `rst = 1`, the D Flip-Flop clears ($q = 0$), and all edge signals are driven low.
-2.  **State Capture**: On every clock edge, the current `sig` is stored in the D Flip-Flop: $q \Leftarrow sig$.
-3.  **Comparison**: The combinational logic compares the current `sig` with the newly stored $q$.
-4.  **Generation**: If the state matches the defined edge conditions, the corresponding output bit pulses high for one clock cycle.
+### Step 1
 
-### Example Trace
-| Cycle | `sig` | $q$ (Prev) | `pos_edge` | `neg_edge` | `both_edge` |
-| :--- | :--- | :--- | :--- | :--- | :--- |
+Store the current input signal in the D Flip-Flop.
+
+```
+q <= sig
+```
+
+---
+
+### Step 2
+
+Compare the current signal with the previous signal.
+
+---
+
+### Step 3
+
+If
+
+```
+0 → 1
+```
+
+Generate
+
+```
+pos_edge = 1
+```
+
+---
+
+### Step 4
+
+If
+
+```
+1 → 0
+```
+
+Generate
+
+```
+neg_edge = 1
+```
+
+---
+
+### Step 5
+
+Generate
+
+```
+both_edge = pos_edge | neg_edge
+```
+
+---
+
+# Example Operation
+
+Assume the input signal changes as
+
+| Clock Cycle | Signal (sig) | Previous (q) | Positive Edge | Negative Edge | Both Edge |
+|-------------|--------------|--------------|---------------|---------------|-----------|
 | Reset | 0 | 0 | 0 | 0 | 0 |
 | 1 | 1 | 0 | 1 | 0 | 1 |
 | 2 | 1 | 1 | 0 | 0 | 0 |
@@ -66,30 +211,55 @@ The detection logic relies on comparing the current input (`sig`) with the store
 
 ---
 
-## Verilog Implementation Details
+# Register Description
 
-| Operator | Symbol | Purpose |
-| :--- | :--- | :--- |
-| **AND** | `&` | Detects specific edge conditions |
-| **OR** | `|` | Combines positive and negative outputs |
-| **NOT** | `~` | Inverts signals for logic comparisons |
-| **Non-blocking** | `<=` | Updates sequential registers on clock edge |
+| Register | Function |
+|----------|----------|
+| q | Stores the previous value of the input signal |
 
 ---
 
-## Applications
-*   **Pulse Generation**: Creating triggers for state machines.
-*   **Digital Communication**: Synchronizing data streams.
-*   **Event Detection**: Interrupt handling in microcontrollers.
-*   **FPGA/ASIC**: Clock gating and signal synchronization.
+# Verilog Operators Used
+
+| Operator | Symbol | Description |
+|----------|--------|-------------|
+| AND | & | Detects edge conditions |
+| OR | \| | Combines positive and negative edge outputs |
+| NOT | ~ | Generates complement of the stored signal |
+| Non-blocking Assignment | <= | Updates the D Flip-Flop on the clock edge |
 
 ---
 
-## Limitations
-*   **Synchronous Reliance**: Edges are only detected on clock events. A signal that rises and falls entirely between two clock edges will be missed.
-*   **Sampling Stability**: Requires a stable, jitter-free clock for reliable operation.
+# Applications
+
+- Pulse generation
+- Digital communication systems
+- Interrupt detection
+- Finite State Machines (FSMs)
+- Synchronizers
+- Event detection circuits
+- FPGA and ASIC designs
 
 ---
 
-## Conclusion
-This Edge Detector design leverages sequential storage (D Flip-Flop) and basic Boolean logic to identify signal transitions. It is a highly efficient, modular design suitable for standard FPGA and ASIC integration where reliable event detection is required.
+# Advantages
+
+- Simple and efficient design.
+- Uses only one D Flip-Flop.
+- Detects rising, falling and both edges.
+- Suitable for FPGA implementation.
+- Easy to understand and verify.
+
+---
+
+# Limitations
+
+- Detects edges only on clock events (synchronous operation).
+- Very short pulses may be missed if they occur between clock edges.
+- Requires a stable clock for reliable operation.
+
+---
+
+# Conclusion
+
+An Edge Detector was designed using a D Flip-Flop and simple combinational logic in Verilog HDL. The previous value of the input signal is stored and compared with the current value to detect rising, falling and both edges. This design demonstrates the use of sequential logic for event detection and provides an efficient implementation suitable for FPGA-based digital systems.

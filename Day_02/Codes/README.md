@@ -1,15 +1,13 @@
-# Full Adder using Half Adders in Verilog
+# Day 02 - Verilog Codes
 
-## Overview
-This repository contains a structural level Verilog implementation of a 1-bit Full Adder. The full adder is constructed by instantiating two Half Adder modules and an OR gate. A comprehensive testbench is also included to verify the logic.
+This folder contains the Verilog HDL programs for implementing a Full Adder using Two Half Adders.
 
-## Files Included
-* **`full_adder.v`**: The main design file containing both the `half_adder` and `full_adder` modules.
-* **`full_adder_tb.v`**: The testbench file that iterates through all 8 possible input combinations to verify the truth table.
+## Files
 
-## Simulation
-The testbench applies all possible 3-bit input combinations (from `000` to `111`) using a `for` loop with a 10ns delay between each test vector. 
+- full_adder_using_two_half_adders.v
+- tb_full_adder.v
 
-### Tools Used
-* Language: Verilog HDL
-* IDE / Simulator: [Insert your tool here, e.g., Xilinx Vivado / ModelSim / Icarus Verilog]
+## Description
+
+- `full_adder_using_two_half_adders.v` contains the Half Adder and Full Adder modules.
+- `tb_full_adder.v` is the testbench used for simulation.

@@ -1,15 +1,17 @@
-# Day 09: 16-to-4 Priority Encoder (Hexadecimal to Binary Converter)
+# Day 09 - Verilog Codes
 
-## Overview
-This folder contains the Verilog HDL implementation and supporting files for a 16-to-4 Priority Encoder. The circuit functions as a hexadecimal-to-binary converter, translating a 16-bit one-hot input vector into its corresponding 4-bit binary representation.
+This folder contains the Verilog HDL programs for implementing a 16-to-4 Priority Encoder (Hexadecimal to Binary Converter).
 
-## Project Files
+## Files
 
-*   **`hex_to_binary.v`**
-    The core hardware description module. It implements the 16-to-4 encoding logic using a combinational `case` statement to map the one-hot input directly to a 4-bit binary output.
-    
-*   **`tb_hex_to_binary.v`**
-    The simulation testbench. It verifies the logic of the encoder by cycling through valid one-hot input combinations as well as edge cases and invalid states, ensuring the output correctly matches the expected behavior.
+- hex_to_binary.v
+- tb_hex_to_binary.v
+- hex_to_binary.xdc
 
-*   **`hex_to_binary.xdc`**
-    The Xilinx Design Constraints (XDC) file. This is used for physical FPGA synthesis, mapping the logical inputs (switches) and outputs (LEDs) to the actual FPGA package pins and setting the required I/O standard (`LVCMOS33`).
+## Description
+
+**hex_to_binary.v** contains the Verilog module for a 16-to-4 encoder that converts a one-hot 16-bit input into its corresponding 4-bit binary output using a combinational case statement.
+
+**tb_hex_to_binary.v** contains the testbench used to simulate and verify the functionality of the encoder by applying valid and invalid input combinations.
+
+**hex_to_binary.xdc** contains the Xilinx Design Constraints (XDC) file that maps the FPGA input switches and output LEDs to the corresponding FPGA package pins and specifies the I/O standard (`LVCMOS33`) required for hardware implementation.

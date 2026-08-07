@@ -1,164 +1,374 @@
-# Day 07: Universal Flip-Flop Design (D, T, and JK)
+# Day 07 - D, T and JK Flip-Flops using a Common D Flip-Flop
 
-## Overview
-A flip-flop serves as the fundamental memory element in digital electronics, storing a single bit of data and updating its state synchronized to a clock edge. 
+## Introduction
 
-This project demonstrates a unified architecture where a single **D Flip-Flop** is configured to emulate three distinct flip-flop types:
-*   D Flip-Flop
-*   T Flip-Flop
-*   JK Flip-Flop
+A Flip-Flop is a sequential logic circuit that stores one bit of information. It changes its output only on the triggering edge of the clock signal, making it the basic memory element in digital systems.
 
-The active mode is dynamically controlled via a **3:1 Multiplexer** using a 2-bit selector (`m`).
+In this design, a single **D Flip-Flop** is used to implement three different types of flip-flops:
 
----
+- D Flip-Flop
+- T Flip-Flop
+- JK Flip-Flop
 
-## Hardware Components
-*   Base D Flip-Flop
-*   Combinational Logic (for T and JK emulation)
-*   3:1 Multiplexer
-*   Synchronous Clock
-*   Asynchronous Reset
+A **3:1 Multiplexer** selects the desired flip-flop output using a 2-bit select input (`m`).
 
 ---
 
-## Port Configuration
+# Circuit Components
 
-### Inputs
-*   **`clk`**: System clock signal.
-*   **`reset`**: Asynchronous active-high reset.
-*   **`a`**: Primary input (Functions as **D**, **T**, or **J** depending on the mode).
-*   **`b`**: Secondary input (Functions as **K** for the JK mode).
-*   **`m[1:0]`**: 2-bit mode selector.
+The circuit consists of:
 
-### Outputs
-*   **`q`**: The selected flip-flop's current state.
-*   **`qb`**: The inverted state of `q`.
+- D Flip-Flop
+- T Flip-Flop (implemented using D Flip-Flop)
+- JK Flip-Flop (implemented using D Flip-Flop)
+- 3:1 Multiplexer
+- Clock
+- Reset
 
 ---
 
-## Mode Selection
+# Inputs
 
-| `m[1:0]` | Active Mode |
-|---|---|
+- **clk** – System clock
+- **reset** – Asynchronous reset
+- **a** – Input D or J or T
+- **b** – Input K (used only for JK Flip-Flop)
+- **m[1:0]** – Flip-Flop selection
+
+---
+
+# Outputs
+
+- **q** – Selected Flip-Flop output
+- **qb** – Complement of the selected output
+
+---
+
+# Flip-Flop Selection
+
+| m | Selected Flip-Flop |
+|---|--------------------|
 | 00 | D Flip-Flop |
 | 01 | T Flip-Flop |
 | 10 | JK Flip-Flop |
-| 11 | Default State |
+| 11 | Default Output |
 
 ---
 
-## Flip-Flop Implementations
+# D Flip-Flop
 
-### 1. D Flip-Flop Mode (`m = 00`)
-The input `a` is routed directly to the base flip-flop.
+## Characteristic Equation
 
-**Characteristic Equation:**
-$$Q_{next} = D$$
+```
+Q(next) = D
+```
 
-**Truth Table:**
+## Truth Table
 
-| D (`a`) | $Q_{next}$ |
-|---|---|
+| D | Q(next) |
+|---|----------|
 | 0 | 0 |
 | 1 | 1 |
 
-### 2. T (Toggle) Flip-Flop Mode (`m = 01`)
-The T flip-flop behavior is synthesized using the base D flip-flop and an XOR gate. The input `a` acts as the toggle trigger.
+### Example
 
-**Characteristic Equation:**
-$$D = T \oplus Q$$
+Current Q = 0
 
-**Truth Table:**
+If
 
-| T (`a`) | Current Q | $Q_{next}$ | Behavior |
-|---|---|---|---|
-| 0 | 0 | 0 | Hold |
-| 0 | 1 | 1 | Hold |
-| 1 | 0 | 1 | Toggle |
-| 1 | 1 | 0 | Toggle |
+```
+D = 1
+```
 
-### 3. JK Flip-Flop Mode (`m = 10`)
-The JK flip-flop is realized through combinational logic feeding into the base D flip-flop. Inputs `a` and `b` serve as J and K, respectively.
+After the next positive clock edge,
 
-**Characteristic Equation:**
-$$D = J\overline{Q} + \overline{K}Q$$
-
-**Truth Table:**
-
-| J (`a`) | K (`b`) | Current Q | $Q_{next}$ | Behavior |
-|---|---|---|---|---|
-| 0 | 0 | Q | Q | Hold |
-| 0 | 1 | X | 0 | Reset |
-| 1 | 0 | X | 1 | Set |
-| 1 | 1 | 0 | 1 | Toggle |
-| 1 | 1 | 1 | 0 | Toggle |
+```
+Q = 1
+```
 
 ---
 
-## Operational Flow
+# T Flip-Flop
 
-### Initialization (Reset)
-When `reset = 1`, the internal state is cleared immediately, regardless of the clock or inputs:
-*   `q = 0`
-*   `qb = 1`
+A T Flip-Flop is implemented using a D Flip-Flop.
 
-### Execution
-When `reset = 0`, the multiplexer evaluates `m[1:0]` to route the correct boolean logic into the base D flip-flop. On every rising edge of `clk`, the flip-flop updates its state based on the selected characteristic equation.
+## Equation
+
+```
+D = T ⊕ Q
+```
+
+where
+
+- T = a
+- Q = Current Output
+
+## Truth Table
+
+| T | Current Q | Next Q |
+|---|-----------|---------|
+| 0 | 0 | 0 |
+| 0 | 1 | 1 |
+| 1 | 0 | 1 |
+| 1 | 1 | 0 |
+
+### Example
+
+Current Q = 0
+
+```
+T = 1
+```
+
+```
+Next Q = 1
+```
+
+Next clock
+
+Current Q = 1
+
+```
+T = 1
+```
+
+```
+Next Q = 0
+```
+
+The output toggles whenever T = 1.
 
 ---
 
-## Example Traces
+# JK Flip-Flop
 
-### D Flip-Flop Trace
-| Clock Edge | D Input | Output Q |
-|---|---|---|
+The JK Flip-Flop is implemented using a D Flip-Flop.
+
+## Characteristic Equation
+
+```
+D = JQ' + K'Q
+```
+
+where
+
+- J = a
+- K = b
+
+## Truth Table
+
+| J | K | Current Q | Next Q |
+|---|---|-----------|---------|
+| 0 | 0 | Q | Hold |
+| 0 | 1 | X | 0 |
+| 1 | 0 | X | 1 |
+| 1 | 1 | 0 | 1 |
+| 1 | 1 | 1 | 0 |
+
+### Example
+
+Current Q = 0
+
+```
+J = 1
+K = 0
+```
+
+Next output
+
+```
+Q = 1
+```
+
+Current Q = 1
+
+```
+J = 1
+K = 1
+```
+
+Next output
+
+```
+Q = 0
+```
+
+The output toggles when both J and K are HIGH.
+
+---
+
+# Working
+
+## Reset (reset = 1)
+
+All flip-flops are cleared.
+
+```
+Q = 0
+QB = 1
+```
+
+---
+
+## D Flip-Flop Mode (m = 00)
+
+The input **a** is directly connected to the D Flip-Flop.
+
+```
+Q(next) = a
+```
+
+---
+
+## T Flip-Flop Mode (m = 01)
+
+The input **a** acts as the toggle input.
+
+```
+D = a ⊕ Q
+```
+
+When
+
+```
+a = 0
+```
+
+the output remains unchanged.
+
+When
+
+```
+a = 1
+```
+
+the output toggles.
+
+---
+
+## JK Flip-Flop Mode (m = 10)
+
+Inputs
+
+```
+a = J
+b = K
+```
+
+The D input becomes
+
+```
+D = JQ' + K'Q
+```
+
+The JK Flip-Flop performs
+
+- Hold
+- Reset
+- Set
+- Toggle
+
+depending on J and K.
+
+---
+
+# Multiplexer Operation
+
+The outputs of all three flip-flops are connected to a 3:1 multiplexer.
+
+| Select (m) | Output |
+|-------------|---------|
+| 00 | D Flip-Flop |
+| 01 | T Flip-Flop |
+| 10 | JK Flip-Flop |
+| 11 | Default (Q=0, QB=1) |
+
+---
+
+# Example Operation
+
+## D Flip-Flop
+
+| Clock | D | Q |
+|--------|---|---|
 | Reset | X | 0 |
 | 1 | 1 | 1 |
 | 2 | 0 | 0 |
+| 3 | 1 | 1 |
 
-### T Flip-Flop Trace
-| Clock Edge | T Input | Output Q |
-|---|---|---|
+---
+
+## T Flip-Flop
+
+| Clock | T | Q |
+|--------|---|---|
 | Reset | X | 0 |
 | 1 | 1 | 1 |
 | 2 | 1 | 0 |
 | 3 | 0 | 0 |
+| 4 | 1 | 1 |
 
-### JK Flip-Flop Trace
-| Clock Edge | J | K | Output Q |
-|---|---|---|---|
+---
+
+## JK Flip-Flop
+
+| Clock | J | K | Q |
+|--------|---|---|---|
 | Reset | X | X | 0 |
 | 1 | 1 | 0 | 1 |
 | 2 | 0 | 0 | 1 |
-| 3 | 1 | 1 | 0 |
+| 3 | 0 | 1 | 0 |
 | 4 | 1 | 1 | 1 |
+| 5 | 1 | 1 | 0 |
 
 ---
 
-## Verilog Implementation Details
+# Verilog Operators Used
 
-| Operator | Symbol | Usage in Design |
-|---|---|---|
-| **XOR** | `^` | Synthesizes the T flip-flop logic |
-| **AND** | `&` | Used in the JK boolean equation |
-| **OR** | `|` | Combines product terms for the JK equation |
-| **NOT** | `~` | Inverts inputs and current state |
-| **Non-blocking** | `<=` | Updates sequential register state |
-| **Case** | `case` | Implements the 3:1 multiplexer logic |
+| Operator | Symbol | Description |
+|----------|--------|-------------|
+| XOR | ^ | Used for T Flip-Flop implementation |
+| AND | & | Used in JK equation |
+| OR | \| | Combines JK terms |
+| NOT | ~ | Generates complement |
+| Non-blocking Assignment | <= | Sequential register update |
+| Case Statement | case | Selects the desired Flip-Flop |
 
 ---
 
-## Project Evaluation
+# Applications
 
-### Advantages
-*   **Resource Efficiency:** Maximizes code reuse by relying on a single underlying memory element.
-*   **Modular Architecture:** Easy to scale or adapt for complex state machines.
-*   **Educational Value:** Clearly illustrates how complex sequential behaviors (T, JK) can be derived from combinational logic and a simple delay (D) element.
+- Registers
+- Counters
+- Shift Registers
+- Frequency Division
+- State Machines
+- Memory Elements
+- FPGA Design
+- ASIC Design
+- Digital Systems
 
-### Limitations
-*   **Overhead:** Requires extra combinational logic gates to synthesize T and JK behaviors.
-*   **Single Output:** Only one flip-flop mode can be active and observed at any given time.
-*   **Unused State:** The `11` selector state is essentially a wasted configuration.
+---
 
-## Summary
-This module successfully consolidates the functionality of D, T, and JK flip-flops into a single, multiplexer-driven Verilog design. By manipulating combinational logic equations before the D-input, the circuit dynamically adapts its behavior. This serves as an excellent demonstration of hardware reuse and sequential logic modeling for FPGA and ASIC design workflows.
+# Advantages
+
+- Uses a common D Flip-Flop to implement multiple flip-flops.
+- Modular and reusable design.
+- Easy to understand.
+- Hardware efficient.
+- Suitable for FPGA implementation.
+- Demonstrates sequential logic concepts.
+
+---
+
+# Limitations
+
+- Requires additional combinational logic for T and JK implementations.
+- Only one flip-flop output can be selected at a time.
+- The default selection does not represent a valid flip-flop operation.
+
+---
+
+# Conclusion
+
+A versatile flip-flop module was designed using a common D Flip-Flop to implement D, T and JK Flip-Flops in Verilog HDL. A 3:1 multiplexer selects the desired flip-flop output based on the control input. This design demonstrates how different sequential circuits can be realized from a single D Flip-Flop using combinational logic, making it an efficient and educational implementation for FPGA-based digital system design.
