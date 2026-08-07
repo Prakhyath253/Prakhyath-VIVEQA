@@ -1,9 +1,0 @@
-﻿Sentinel_RV-Project.cache/
-Sentinel_RV-Project.hw/
-Sentinel_RV-Project.runs/
-Sentinel_RV-Project.sim/
-Sentinel_RV-Project.srcs/
-*.jou
-*.log
-*.str
-.Xil/
